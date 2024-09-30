@@ -1,0 +1,106 @@
+from decimal import Decimal, getcontext
+from math import sqrt, factorial
+
+def chudnovsky(precision):
+    getcontext().prec = precision + 5
+    C, K, M, L, S = 426880 * Decimal(10005).sqrt(), 6, 1, 13591409, 13591409
+    for index in range(1, precision):
+        M = (K**3 - 16*K) * M // index**3
+        L += 545140134
+        S += Decimal(M) / (K * L)
+        K += 12
+    return str(C / S)[:precision + 2]
+
+def is_prime(number):
+    """Check if a number is prime."""
+    if number < 2:
+        return False
+    if number in (2, 3):
+        return True
+    if number % 2 == 0:
+        return False
+    for i in range(5, int(sqrt(number)) + 1, 6):
+        if number % i == 0 or number % (i + 2) == 0:
+            return False
+    return True
+
+def nth_prime(position):
+    if position < 1: return None
+    count, num = 0, 1
+    while count < position:
+        num += 1
+        if is_prime(num): count += 1
+    return num
+
+def binom(n, k):
+    return factorial(n) // (factorial(k) * factorial(n - k))
+
+def phi(n):
+    getcontext().prec = n
+    return Decimal(((5**.5) + 1) / 2)
+
+def is_fractional(number):
+    return not number.is_integer()
+
+def summation(start, end, function):
+    return sum(function(index) for index in range(start, end + 1))
+
+def accurate_sin(n, precision):
+    getcontext().prec = precision
+    return summation(0, precision, lambda index: ((-1)**index) * (x**(2 * index + 1)) / (factorial(2 * index + 1)))
+
+def write_to_file(filename, content):
+    with open(filename, 'w') as file:
+        file.write(content)
+
+def binary_search(f, a, b, tol=1e-7):
+    if f(a) * f(b) >= 0: raise ValueError()
+    while abs(b - a) > tol:
+        mid = (a + b) / 2
+        a, b = (mid, b) if f(mid) * f(a) < 0 else (a, mid)
+    return (a + b) / 2
+
+def matrix_multiply(A, B):
+    if len(A[0]) != len(B):
+        raise ValueError("Incompatible dimensions")
+    return [[sum(A[i][k] * B[k][j] for k in range(len(B))) for j in range(len(B[0]))] for i in range(len(A))]
+
+def matrix_power(M, n):
+    if n < 0: raise ValueError("Non-negative integer required")
+    R = [[1 if i == j else 0 for j in range(len(M))] for i in range(len(M))]
+    for _ in range(n): R = matrix_multiply(R, M)
+    return R
+
+def matrix_add(A, B):
+    if len(A) != len(B) or len(A[0]) != len(B[0]):
+        raise ValueError("Matrices must have the same dimensions")
+    return [[A[i][j] + B[i][j] for j in range(len(A[0]))] for i in range(len(A))]
+
+def matrix_subtract(A, B):
+    if len(A) != len(B) or len(A[0]) != len(B[0]):
+        raise ValueError("Matrices must have the same dimensions")
+    return [[A[i][j] - B[i][j] for j in range(len(A[0]))] for i in range(len(A))]
+
+def matrix_divide(A, scalar):
+    if scalar == 0:
+        raise ValueError("Division by zero")
+    return [[A[i][j] / scalar for j in range(len(A[0]))] for i in range(len(A))]
+
+def fractional_factorial(x):
+    if x < 0:
+        raise ValueError("Undefined for negative numbers")
+    if x < 1:
+        return fractional_factorial(x + 1) / x
+    return 1 if x == 1 else x * fractional_factorial(x - 1)
+
+def limit(func, c, delta=1e-10):
+    return (func(c + delta) + func(c - delta)) / 2
+
+def fixed_point_iter(g, initial_x, tolerance=1e-10, max_iterations=100):
+    x = initial_x
+    for _ in range(max_iterations):
+        next_x = g(x)
+        if abs(next_x - x) < tolerance:
+            break
+        x = next_x
+    return x
