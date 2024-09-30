@@ -104,3 +104,6 @@ def fixed_point_iter(g, initial_x, tolerance=1e-10, max_iterations=100):
             break
         x = next_x
     return x
+
+def fib(n):
+    return matrix_multipy([[0,1],[1,1]],n)
